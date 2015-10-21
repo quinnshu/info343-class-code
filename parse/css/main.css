@@ -10,4 +10,5 @@ body {
 #error-message {
     display: none;
 }
-
+i {
+    display: none}
