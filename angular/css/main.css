@@ -1,0 +1,14 @@
+
+body {
+    font-family: Lato, 'Helvetica Neue', Helvetica, sans-serif;
+    font-size: 18px;
+}
+
+.completed-task {
+    color: #AAA;
+    text-decoration: line-through;
+}
+
+ul li {
+    cursor: pointer;
+}
