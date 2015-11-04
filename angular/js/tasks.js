@@ -2,6 +2,7 @@
     script for the tasks.html file 
 */
 
+<<<<<<< HEAD
 angular.module('Tasks', [])
     .constant('tasksKey', 'tasks')
     .controller('TasksController', function($scope, tasksKey) {
@@ -30,3 +31,5 @@ angular.module('Tasks', [])
             saveTasks();
         };
     });
+=======
+>>>>>>> 0e1f3c03a332ce37c172bdee43ad742a11ba4994
