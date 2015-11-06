@@ -10,6 +10,9 @@
 angular.module('ContactsApp', ['ui.router', 'angular-uuid', 'LocalStorageModule'])
     .constant('storageKey', 'contacts-list')
     .factory('contacts', function(uuid, localStorageService,storageKey) {
+        return (localStorageService.get(storageKey) || []);
+    }
+/*
         return [{
             id: 'default-delete-me',
             fname: 'Shawn',
@@ -17,7 +20,8 @@ angular.module('ContactsApp', ['ui.router', 'angular-uuid', 'LocalStorageModule'
             phone: '1-800-NAMDAR',
             dob: '11/2/2015'
         }];
-    })
+        */
+)
     .config(function($stateProvider, $urlRouterProvider) {
         $stateProvider
             .state('list', {
@@ -37,6 +41,18 @@ angular.module('ContactsApp', ['ui.router', 'angular-uuid', 'LocalStorageModule'
             });
         $urlRouterProvider.otherwise('/contacts');
     })
+    //register a directive for custom validation of dates in the past
+    .directive('inThePast', function() {
+        return {
+            require: 'ngModel',
+            link: function(scope, elem, attrs, controller) {
+                controller.$validators.inThePast = function(modelValue) {
+                    var today = new Date();
+                    return (new Date(modelValue) <= today);
+                }
+            }
+        };
+    })
     .controller('ContactsController', function($scope, contacts) {
         //revert to default if not valid
         $scope.contacts = contacts;
@@ -47,7 +63,7 @@ angular.module('ContactsApp', ['ui.router', 'angular-uuid', 'LocalStorageModule'
            return contact.id === $stateParams.id;
         });
     })
-    .controller('EditContactController', function($scope, $stateParams, $state, contacts) {
+    .controller('EditContactController', function($scope, $stateParams, $state, uuid, storageKey, localStorageService, contacts) {
 // make a copy to edit then if the user submits update the original
         var existingContact = $scope.contact = contacts.find(function (contact) {
             //use ID from above captured from url
@@ -57,7 +73,14 @@ angular.module('ContactsApp', ['ui.router', 'angular-uuid', 'LocalStorageModule'
         $scope.contact = angular.copy(existingContact);
 
         $scope.save = function() {
-            angular.copy($scope.contact, existingContact);
+            if($scope.contact.id) {
+                angular.copy($scope.contact, existingContact);
+            } else {
+                $scope.contact.id = uuid.v4();
+                contacts.push($scope.contact);
+            }
+            localStorageService.set(storageKey, contacts);
+
             $state.go('list');
         }
     });
